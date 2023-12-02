@@ -143,6 +143,7 @@ def handle_message(event):
     # 各群組的資訊互相獨立
     try:
         groupID = event.source.group_id
+        print(groupID)
     except: # 此機器人設計給群組回報，單兵不可直接一對一回報給機器人
         message = TextMessage(text='我只接收群組內訊息，請先把我邀請到群組!')
         line_bot_api.reply_message(event.reply_token, message)
