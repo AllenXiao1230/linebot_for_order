@@ -96,13 +96,11 @@ def handle_message(event):
                 LineMessage = msg_clear(groupID)
 
             elif '!help' in receivedmsg and len(receivedmsg)==5:
-                LineMessage = '''我想來點熱食部\n\n------------\n\n指令：
-!o: 在後面加上餐點的編號，兩個中間留空格
-e.g: !o B3 D4\n\n
-!a: 輸出明細\n\n
-!d: 刪除您的餐點\n\n
-!c: 刪除全部的餐點
-'''
+                post_help(groupID)
+
+            elif '!r' in receivedmsg and len(receivedmsg)==2:
+                post_res(groupID)
+
 
             if LineMessage :
                 line_bot_api.reply_message_with_http_info(
