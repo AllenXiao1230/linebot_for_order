@@ -100,7 +100,7 @@ def show_all(groupID):
     print(total)
     print(all_order_meal_dict)
 
-    re_all = '明細:'
+    re_all = '明細:\n'
 
     for i in range(len(all_order_meal_dict[groupID])):
         re_all = re_all + str(list(all_order_meal_dict[groupID].keys())[i]) + str(list(all_order_meal_dict[groupID].values())[i]) + '份\n'
