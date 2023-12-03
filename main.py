@@ -60,7 +60,7 @@ def handle_message(event):
             line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text='我只接收群組內訊息，請先把我邀請到群組!\n指令請打 !help')]
+                messages=[TextMessage(text='我只接收群組內訊息，請先把我邀請到群組!\n更多指令請打 !help')]
             )
         )
         
