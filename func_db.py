@@ -15,7 +15,7 @@ def init_data():
           
 def check_exist(groupID):
     
-    cursorObj.execute(f'CREATE TABLE IF NOT {groupID}(name, order_item, price)')
+    cursorObj.execute(f'CREATE TABLE IF NOT {groupID}(userName, order_item, price)')
     con.commit()
 
 def order(userName, groupID, receivedmsg):
@@ -54,22 +54,28 @@ def get_meal_info(receivedmsg, userName, groupID):
     return re_info
 
 def tabular(groupID, userName):   # 輸出可視化表格
-
-    ret = cur.execute(f"SELECT order_item, price FROM {groupID} WHERE name='{userName}'")
-
     
     list_view = ''
-    for i in show_each_meal_dict.keys():
-        total = 0
-        print(i)
-        list_view += i + '\n'
-
-        for key in show_each_meal_dict[i]:
-            print(key)
-            list_view += key[0] + ':\t' + key[1] + '\n'
-            total += int(key[1])
-        list_view += 'Total:\t\t' + str(total) + '\n\n'
     
+    for i in cur.execute(f"SELECT userName FROM {groupID}'"):
+        
+        total = 0
+        ret = cur.execute(f"SELECT order_item, price FROM {groupID} WHERE userName='{i}'")
+        
+        if list_view == '':
+            list_view += i + '\n'
+            for key in ret:
+                list_view += key[0] + ':\t' + key[1] + '\n'
+                total += int(key[1])
+            list_view += 'Total:\t\t' + str(total)
+            
+        else:
+            list_view += '\n\n' + i + '\n'
+            for key in ret:
+                list_view += key[0] + ':\t' + key[1] + '\n'
+                total += int(key[1])
+            list_view += 'Total:\t\t' + str(total)
+
     return list_view
 
 def show_all(groupID):
