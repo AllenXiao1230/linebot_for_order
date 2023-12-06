@@ -2,42 +2,33 @@ import csv
 
 import sqlite3
 
-def init_data():
-    global show_each_meal_dict
-    global all_meal
-    global info
-    global re_info
-    global all_order_meal_dict
-    global list_view
-
-    show_each_meal_dict = {}
-    all_meal = []
-    info = []
-    all_order_meal_dict = {}
-    re_info = []
-    list_view = ''
-    
+def init_data():    
 
     with open('meal.csv', newline='', encoding='UTF-8') as csvfile:
         rows = csv.reader(csvfile)
 
         for row in rows:
             all_meal.append(row)
+
+    con = sqlite3.connect('order_database.db')
+    cur = con.cursor()
           
 def check_exist(groupID):
-    if not show_each_meal_dict.get(groupID): # 如果此群組為新加入，會創立一個新的儲存區
-        show_each_meal_dict[groupID]={}
-    if not all_order_meal_dict.get(groupID): # 如果此群組為新加入，會創立一個新的儲存區
-        all_order_meal_dict[groupID]={}
+    
+    cursorObj.execute(f'CREATE TABLE IF NOT {groupID}(name, order_item, price)')
+    con.commit()
 
 def order(userName, groupID, receivedmsg):
     receivedmsg = receivedmsg.replace('!o','')
 
     re_info = get_meal_info(receivedmsg, userName, groupID)
-    show_each_meal_dict[groupID][userName] = (re_info[0])
+    #show_each_meal_dict[groupID][userName] = (re_info)
 
+    for i in len(re_info):
+        cur.execute(f"INSERT INTO {groupID} VALUES(?, ?, ?)", (userName, re_info[i][0], re_info[i][1]))
+        con.commit()
 
-    table = tabular(show_each_meal_dict[groupID])
+    table = tabular(groupID, userName)
 
     print('個人明細: ', show_each_meal_dict[groupID])
     print('餐點數量: ', all_order_meal_dict[groupID])
@@ -49,31 +40,24 @@ def get_meal_info(receivedmsg, userName, groupID):
     # re_info = userName + ':'
     meal_list = receivedmsg.split()
     total = 0
-    print(meal_list)
     info = []
     re_info = []
-    total = 0
 
-    for i in range(len(meal_list)):
+    for i in range(len(meal_list)):    #from code get meal name
         for j in range(len(all_meal)):
             if meal_list[i] == all_meal[j][0]:
                 info.append(all_meal[j])
 
-    for i in range(len(info)):     
-        total += int(info[i][2]) #總金額
-
     for i in range(len(info)):
         re_info.append([info[i][1], info[i][2]])
 
-    for i in range(len(meal_list)):
-        if not all_order_meal_dict[groupID].get(info[i][1]): 
-            all_order_meal_dict[groupID][info[i][1]] = 1
-        else:
-            all_order_meal_dict[groupID][info[i][1]] += 1
+    return re_info
 
-    return re_info, total
+def tabular(groupID, userName):   # 輸出可視化表格
 
-def tabular(show_each_meal_dict):   # 輸出可視化表格
+    ret = cur.execute(f"SELECT order_item, price FROM {groupID} WHERE name='{userName}'")
+
+    
     list_view = ''
     for i in show_each_meal_dict.keys():
         total = 0
