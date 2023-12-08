@@ -53,7 +53,7 @@ def handle_message(event):
         line_bot_api = MessagingApi(api_client)
 
         try:
-            groupID = event.source.group_id
+            groupID = str(event.source.group_id)
             print(groupID)
 
         except: # 此機器人設計給群組回報，單兵不可直接一對一回報給機器人
@@ -65,7 +65,7 @@ def handle_message(event):
         )
         
         else:
-            userID = event.source.user_id
+            userID = str(event.source.user_id)
 
             g_profile = line_bot_api.get_group_summary(groupID)
             groupName = g_profile.group_name
