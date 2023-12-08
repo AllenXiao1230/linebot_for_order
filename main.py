@@ -19,7 +19,7 @@ from linebot.v3.webhooks import (
 )
 import os
 
-from function import *
+from func_db import *
 
 app = Flask(__name__)
 
