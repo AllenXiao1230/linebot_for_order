@@ -4,6 +4,7 @@ import sqlite3
 
 import requests
 
+from linebot.models import *
 # from linebot.models import *
 
 def init_data():   
@@ -158,14 +159,11 @@ def get_photo():
     return message
 
 
-def test_image_component(self):
+def image():
     arg = {
         'url': 'https://example.com/flex/images/image.jpg',
         'size': 'full',
         'animated': False,
         'aspect_ratio': '1.91:1'
     }
-    self.assertEqual(
-        self.serialize_as_dict(arg, type=self.IMAGE),
-        ImageComponent(**arg).as_json_dict()
-    )
+    return arg

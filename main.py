@@ -11,7 +11,10 @@ from linebot.v3.messaging import (
     ApiClient,
     MessagingApi,
     ReplyMessageRequest,
-    TextMessage
+    TextMessage,
+    ImageMessage,
+    FlexImage
+
 )
 from linebot.v3.webhooks import (
     MessageEvent,
@@ -98,11 +101,18 @@ def handle_message(event):
                 LineMessage = msg_clear(groupID)
 
             elif '!help' in receivedmsg and len(receivedmsg)==5:
-                messages = imagemap_message()
+                messages = image()
 
             elif '!r' in receivedmsg and len(receivedmsg)==2:
-                message = imagemap_message()
-                line_bot_api.reply_message(event.reply_token, message)
+                message = image()
+                line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=ImageComponent(url='https://example.com/flex/images/image.jpg', size='full', aspect_ratio='3:4')
+                    )
+                )
+
+                
 
             if LineMessage :
                 line_bot_api.reply_message_with_http_info(
