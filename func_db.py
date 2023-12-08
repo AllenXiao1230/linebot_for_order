@@ -2,7 +2,20 @@ import csv
 
 import sqlite3
 
-def init_data():    
+import requests
+
+def init_data():   
+
+
+    global all_meal
+    global info
+    global re_info
+    global list_view
+
+    all_meal = []
+    info = []
+    re_info = []
+    list_view = '' 
 
     with open('meal.csv', newline='', encoding='UTF-8') as csvfile:
         rows = csv.reader(csvfile)
@@ -10,12 +23,19 @@ def init_data():
         for row in rows:
             all_meal.append(row)
 
-    con = sqlite3.connect('order_database.db')
-    cur = con.cursor()
+con = sqlite3.connect('order_database.db')
+cur = con.cursor()
           
 def check_exist(groupID):
     
-    cursorObj.execute(f'CREATE TABLE IF NOT {groupID}(userName, order_item, price)')
+    cur.execute(f'CREATE TABLE IF NOT EXISTS {groupID}(userName, order_item, price)')
+    con.commit()
+
+    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Allen', 'itemA', 10))
+    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Ian', 'itemB', 20))
+    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Ryan', 'itemC', 50))
+    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Vivi', 'itemA', 10))
+    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Bob', 'itemB', 20))
     con.commit()
 
 def order(userName, groupID, receivedmsg):
@@ -30,8 +50,6 @@ def order(userName, groupID, receivedmsg):
 
     table = tabular(groupID, userName)
 
-    print('個人明細: ', show_each_meal_dict[groupID])
-    print('餐點數量: ', all_order_meal_dict[groupID])
     return table
 
 
@@ -53,7 +71,7 @@ def get_meal_info(receivedmsg, userName, groupID):
 
     return re_info
 
-def tabular(groupID, userName):   # 輸出可視化表格
+def tabular(groupID):   # 輸出可視化表格
     
     list_view = ''
     
@@ -81,39 +99,41 @@ def tabular(groupID, userName):   # 輸出可視化表格
 def show_all(groupID):
     
     total = 0
-    for i in range(len(all_order_meal_dict[groupID])):
-        for j in range(len(all_meal)):
-            if list(all_order_meal_dict[groupID].keys())[i] == all_meal[j][1]:
-                total += int(all_meal[j][2])
+    total = str(list(cur.execute(f'SELECT SUM (price) FROM {groupID}'))[0][0])
+
+    all_list = list(cur.execute(f'SELECT order_item as items,COUNT(*) as times FROM {groupID} GROUP BY order_item'))
+
 
     print(total)
-    print(all_order_meal_dict)
+    print(list(all_list))
 
     re_all = '明細:\n'
 
-    for i in range(len(all_order_meal_dict[groupID])):
-        re_all = re_all + str(list(all_order_meal_dict[groupID].keys())[i]) + str(list(all_order_meal_dict[groupID].values())[i]) + '份\n'
+    for i in all_list:
+        re_all = re_all + str(i[0]) + str(i[1]) + '份\n'
+
     re_all += '\n共 ' + str(total) + ' 元'
     return re_all
 
 
 def msg_clear(groupID):
-    all_order_meal_dict[groupID].clear()
-    show_each_meal_dict[groupID].clear()
+    cur.execute(f'DELETE FROM {groupID}')
     tmp_str = '資料已重置!'
     return tmp_str
 
 def delete(userName, groupID):
 
-    for i in range(len(show_each_meal_dict[groupID][userName])):
+    cur.execute(f'DELETE FROM {groupID} WHERE userName = {userName}')
 
-        print(show_each_meal_dict[groupID][userName][i][0])
-        all_order_meal_dict[groupID][show_each_meal_dict[groupID][userName][i][0]] -= 1
+    # for i in range(len(show_each_meal_dict[groupID][userName])):
 
-    del show_each_meal_dict[groupID][userName]
-    print(show_each_meal_dict[groupID])
+    #     print(show_each_meal_dict[groupID][userName][i][0])
+    #     all_order_meal_dict[groupID][show_each_meal_dict[groupID][userName][i][0]] -= 1
 
-    return tabular(show_each_meal_dict[groupID])
+    # del show_each_meal_dict[groupID][userName]
+    # print(show_each_meal_dict[groupID])
+
+    return tabular(groupID)
 
 def get_photo():
     message = {
@@ -131,7 +151,6 @@ def get_photo():
     }
     return message
 
-import requests
 
 def post_help(groupID):
     # LINE Bot 的 Channel Access Token
