@@ -19,6 +19,8 @@ from linebot.v3.webhooks import (
 )
 import os
 
+from linebot.models import *
+
 from func_db import *
 
 app = Flask(__name__)
@@ -96,11 +98,11 @@ def handle_message(event):
                 LineMessage = msg_clear(groupID)
 
             elif '!help' in receivedmsg and len(receivedmsg)==5:
-                post_help(groupID)
+                messages = imagemap_message()
 
             elif '!r' in receivedmsg and len(receivedmsg)==2:
-                post_res(groupID)
-
+                message = imagemap_message()
+                line_bot_api.reply_message(event.reply_token, message)
 
             if LineMessage :
                 line_bot_api.reply_message_with_http_info(
