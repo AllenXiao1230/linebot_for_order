@@ -31,24 +31,30 @@ def check_exist(groupID):
     cur.execute(f'CREATE TABLE IF NOT EXISTS {groupID}(userName, order_item, price)')
     con.commit()
 
-    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Allen', 'itemA', 10))
-    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Ian', 'itemB', 20))
-    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Ryan', 'itemC', 50))
-    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Vivi', 'itemA', 10))
-    cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Bob', 'itemB', 20))
-    con.commit()
+    # cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Allen', 'itemA', 10))
+    # cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Ian', 'itemB', 20))
+    # cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Ryan', 'itemC', 50))
+    # cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Vivi', 'itemA', 10))
+    # cur.execute(f'INSERT INTO {groupID} VALUES (?, ?, ?)', ('Bob', 'itemB', 20))
+    # con.commit()
 
 def order(userName, groupID, receivedmsg):
+    delete(userName, groupID)
     receivedmsg = receivedmsg.replace('!o','')
-
+    receivedmsg = receivedmsg.upper()
+    
     re_info = get_meal_info(receivedmsg, userName, groupID)
-    #show_each_meal_dict[groupID][userName] = (re_info)
 
-    for i in len(re_info):
-        cur.execute(f"INSERT INTO {groupID} VALUES(?, ?, ?)", (userName, re_info[i][0], re_info[i][1]))
+    print(re_info)
+
+    if len(re_info) == 0:
+        return '請輸入正確的餐點'
+    
+    for i in re_info:
+        cur.execute(f"INSERT INTO {groupID} VALUES(?, ?, ?)", (userName, i[0], i[1]))
         con.commit()
 
-    table = tabular(groupID, userName)
+    table = tabular(groupID)
 
     return table
 
@@ -75,20 +81,20 @@ def tabular(groupID):   # 輸出可視化表格
     
     list_view = ''
     
-    for i in cur.execute(f"SELECT userName FROM {groupID}'"):
+    for i in cur.execute(f"SELECT userName FROM {groupID}"):
         
         total = 0
-        ret = cur.execute(f"SELECT order_item, price FROM {groupID} WHERE userName='{i}'")
+        ret = cur.execute(f"SELECT order_item, price FROM {groupID} WHERE userName=?",(i))
         
         if list_view == '':
-            list_view += i + '\n'
+            list_view += str(i[0]) + '\n'
             for key in ret:
                 list_view += key[0] + ':\t' + key[1] + '\n'
                 total += int(key[1])
             list_view += 'Total:\t\t' + str(total)
             
         else:
-            list_view += '\n\n' + i + '\n'
+            list_view += '\n\n' + str(i[0]) + '\n'
             for key in ret:
                 list_view += key[0] + ':\t' + key[1] + '\n'
                 total += int(key[1])
@@ -113,25 +119,23 @@ def show_all(groupID):
         re_all = re_all + str(i[0]) + str(i[1]) + '份\n'
 
     re_all += '\n共 ' + str(total) + ' 元'
-    return re_all
+
+    if re_all == '':
+        return '目前無人點餐'
+    else:
+        return re_all
 
 
 def msg_clear(groupID):
     cur.execute(f'DELETE FROM {groupID}')
+    con.commit()
     tmp_str = '資料已重置!'
     return tmp_str
 
 def delete(userName, groupID):
 
-    cur.execute(f'DELETE FROM {groupID} WHERE userName = {userName}')
-
-    # for i in range(len(show_each_meal_dict[groupID][userName])):
-
-    #     print(show_each_meal_dict[groupID][userName][i][0])
-    #     all_order_meal_dict[groupID][show_each_meal_dict[groupID][userName][i][0]] -= 1
-
-    # del show_each_meal_dict[groupID][userName]
-    # print(show_each_meal_dict[groupID])
+    cur.execute(f'DELETE FROM {groupID} WHERE userName="{userName}"')
+    con.commit()
 
     return tabular(groupID)
 
