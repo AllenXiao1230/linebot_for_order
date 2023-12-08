@@ -23,7 +23,7 @@ def init_data():
         for row in rows:
             all_meal.append(row)
 
-con = sqlite3.connect('order_database.db')
+con = sqlite3.connect('order_database.db', check_same_thread=False)
 cur = con.cursor()
           
 def check_exist(groupID):
