@@ -61,12 +61,36 @@ def order(userName, groupID, receivedmsg):
 
     return table
 
+def cust(userName, groupID,  receivedmsg):
+
+    info = []
+    re_info = []
+
+    delete(userName, groupID)
+    receivedmsg = receivedmsg.replace('!m','')
+    receivedmsg = receivedmsg.split(',')
+
+    for i in receivedmsg:
+        re_info.append([i.split()[0], i.split()[1]])
+
+    print(re_info)
+
+    if len(re_info) == 0:
+        return '請輸入正確的餐點'
+    
+    for i in re_info:
+        cur.execute(f"INSERT INTO {groupID} VALUES(?, ?, ?)", (userName, i[0], i[1]))
+        con.commit()
+
+    table = tabular(groupID)
+
+    return table
+
 
 
 def get_meal_info(receivedmsg, userName, groupID):
     # re_info = userName + ':'
     meal_list = receivedmsg.split()
-    total = 0
     info = []
     re_info = []
 
@@ -126,6 +150,7 @@ def show_all(groupID):
     if re_all == '':
         return '目前無人點餐'
     else:
+        msg_clear()
         return re_all
 
 
@@ -141,29 +166,3 @@ def delete(userName, groupID):
     con.commit()
 
     return tabular(groupID)
-
-def get_photo():
-    message = {
-    "type": "bubble",
-    "hero": {
-        "type": "image",
-        "url": "https://imgur.com/gallery/CPPIeuV",
-        "size": "full",
-        "aspectRatio": "1:1",
-        "action": {
-        "type": "uri",
-        "uri": "https://imgur.com/gallery/CPPIeuV"
-        }
-    }
-    }
-    return message
-
-
-def image():
-    arg = {
-        'url': 'https://example.com/flex/images/image.jpg',
-        'size': 'full',
-        'animated': False,
-        'aspect_ratio': '1.91:1'
-    }
-    return arg

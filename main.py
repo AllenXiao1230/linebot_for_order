@@ -12,17 +12,19 @@ from linebot.v3.messaging import (
     MessagingApi,
     ReplyMessageRequest,
     TextMessage,
-    ImageMessage,
-    FlexImage
+    FlexMessage
 
 )
+from linebot.v3.messaging.models import FlexContainer as fl
+from linebot.v3.messaging import TextMessage as tx
+
 from linebot.v3.webhooks import (
     MessageEvent,
     TextMessageContent
 )
 import os
 
-from linebot.models import *
+# from linebot.models import FlexContainer
 
 from func_db import *
 
@@ -100,27 +102,61 @@ def handle_message(event):
             elif '!c' in receivedmsg and len(receivedmsg)==2:
                 LineMessage = msg_clear(groupID)
 
+            elif '!m' in receivedmsg and len(receivedmsg)!=2:
+                LineMessage = cust(userName, groupID, receivedmsg)
+
             elif '!help' in receivedmsg and len(receivedmsg)==5:
-                messages = image()
+                bubble_string = """{
+  "type": "bubble",
+  "hero": {
+    "type": "image",
+    "url": "https://i.imgur.com/8wSlvak.png",
+    "size": "full",
+    "aspectMode": "fit",
+    "aspectRatio": "3:1.7"
+  }
+}"""
+                message = FlexMessage(alt_text="使用說明", contents=fl.from_json(bubble_string))
+                line_bot_api.reply_message(
+                    ReplyMessageRequest(
+                        reply_token=event.reply_token,
+                        messages=[message]
+                    )
+                )
+
 
             elif '!r' in receivedmsg and len(receivedmsg)==2:
-                message = image()
+
+                bubble_string = """{
+  "type": "bubble",
+  "hero": {
+    "type": "image",
+    "url": "https://i.imgur.com/f8X18tf.png",
+    "size": "full",
+    "aspectMode": "fit",
+    "aspectRatio": "3:1.7",
+    "action": {
+      "type": "uri",
+      "label": "action",
+      "uri": "https://i.imgur.com/f8X18tf_d.webp?maxwidth=1520&fidelity=grand"
+    }
+  }
+}"""
+                message = FlexMessage(alt_text="菜單", contents=fl.from_json(bubble_string))
                 line_bot_api.reply_message(
-                ReplyMessageRequest(
-                    reply_token=event.reply_token,
-                    messages=ImageComponent(url='https://example.com/flex/images/image.jpg', size='full', aspect_ratio='3:4')
+                    ReplyMessageRequest(
+                        reply_token=event.reply_token,
+                        messages=[message]
                     )
                 )
 
-                
-
-            if LineMessage :
-                line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=event.reply_token,
-                    messages=[TextMessage(text=str(LineMessage))]
-                    )
+        if LineMessage :
+            line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[tx(text=str(LineMessage))]
                 )
+            )
 
 if __name__ == "__main__":
     init_data()
