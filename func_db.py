@@ -150,7 +150,7 @@ def show_all(groupID):
     if re_all == '':
         return '目前無人點餐'
     else:
-        msg_clear()
+        msg_clear(groupID)
         return re_all
 
 
