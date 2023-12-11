@@ -43,6 +43,7 @@ def check_exist(groupID):
 
 def order(userName, groupID, receivedmsg):
     delete(userName, groupID)
+    re_info = []
     receivedmsg = receivedmsg.replace('!o','')
     receivedmsg = receivedmsg.upper()
     
