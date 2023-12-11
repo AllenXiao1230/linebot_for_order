@@ -109,7 +109,7 @@ def tabular(groupID):   # 輸出可視化表格
     
     list_view = ''
     
-    for i in cur.execute(f"SELECT userName FROM {groupID}"):
+    for i in list(cur.execute(f"SELECT userName FROM {groupID}")):
         
         total = 0
         ret = cur.execute(f"SELECT order_item, price FROM {groupID} WHERE userName=?",(i))
