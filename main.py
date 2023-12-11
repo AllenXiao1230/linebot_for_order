@@ -90,9 +90,6 @@ def handle_message(event):
             if '!o' in receivedmsg and len(receivedmsg)!=2:
                 LineMessage = order(userName, groupID, receivedmsg)
 
-            elif '!o' in receivedmsg and len(receivedmsg)==2:
-                LineMessage = delete(userName, groupID)
-
             elif '!a' in receivedmsg and len(receivedmsg)==2:
                 LineMessage = show_all(groupID)
 
