@@ -117,14 +117,14 @@ def tabular(groupID):   # 輸出可視化表格
         if list_view == '':
             list_view += str(i[0]) + '\n'
             for key in ret:
-                list_view += key[0] + ':\t' + key[1] + '\n'
+                list_view += key[0] + ':\t' + str(key[1]) + '\n'
                 total += int(key[1])
             list_view += 'Total:\t\t' + str(total)
             
         else:
             list_view += '\n\n' + str(i[0]) + '\n'
             for key in ret:
-                list_view += key[0] + ':\t' + key[1] + '\n'
+                list_view += key[0] + ':\t' + str(key[1]) + '\n'
                 total += int(key[1])
             list_view += 'Total:\t\t' + str(total)
 
