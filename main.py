@@ -154,7 +154,7 @@ def handle_message(event):
                 messages=[tx(text=str(LineMessage))]
                 )
             )
-
+            
 if __name__ == "__main__":
     init_data()
     port = int(os.environ.get('PORT', 5000))
